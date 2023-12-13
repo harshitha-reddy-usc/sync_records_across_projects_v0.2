@@ -1,0 +1,215 @@
+{
+	"name": "Sync Records Across Projects",
+
+	"namespace": "Vanderbilt\\SyncRecordsAcrossProjectsExternalModule",
+
+	"description": "Sync Records Across Projects pipes fields in one project into fields of another project if there is an EXACT MATCH on a third field in both projects. The module also provides details of matches in case of PARTIAL MATCH on secondary set of fields in both projects. Enable this module in the DESTINATION project and select appropriate fields in the configure panel.",
+	"authors": [
+		{
+			"name": "DPPHS",
+			"email": "harshith@usc.edu",
+			"institution": "USC - Keck School of Medicine"
+		}
+	],
+
+	"framework-version": 2,
+	 
+	"permissions": [
+		"redcap_every_page_before_render",
+		"select_data"
+	],
+
+	"links": {
+	},
+
+	"no-auth-pages": [
+
+	],
+
+	"system-settings": [
+		
+	],
+	
+	"project-settings": [
+		{
+			"key": "admin-only-warning",
+			"type": "descriptive",
+			"name": "<br><h6>Only users with design rights on all source projects are allowed to configure this module.</h6><br>"
+		},
+		{
+			"key": "sync-projects",
+			"name": "Sync Project",
+			"required": false,
+			"type": "sub_settings",
+			"repeatable": true,
+			"sub_settings": [
+				{
+					"key": "project-id",
+					"name": "Source Project",
+					"required": false,
+					"type": "project-id",
+					"repeatable": false
+				},
+				{
+					"key": "field-match",
+					"name": "Unique Match Field: Unique field used to match records across projects (usually the record_id)",
+					"required": false,
+					"type": "field-list",
+					"repeatable": false
+				},
+				{
+					"key": "field-match-source",
+					"name": "Alternate Source Match Field: This is only used if the Unique Match Field in the destination project has a different variable name from the Unique Match Field in the source project",
+					"required": false,
+					"type": "text",
+					"repeatable": false
+				},
+				{
+					"key": "field-match-secondary",
+					"name": "Secondary Field Match: Match these fields in case field-match is not matched",
+					"required": false,
+					"type": "sub_settings",
+					"repeatable": true,
+					"sub_settings": [
+						{
+							"key": "field-match-destination-secondary",
+							"name": "Secondary Match Field Destination",
+							"required": false,
+							"type": "field-list",
+							"repeatable": false
+						},
+						{
+							"key": "field-match-source-secondary",
+							"name": "Secondary Match Field Source",
+							"required": false,
+							"type": "text",
+							"repeatable": false
+						}
+					]
+				 },
+				 {
+				 "key": "number-secondary-matches",
+				 "name": "Number of matches for a successful secondary match",
+				 "required": false,
+				 "type": "text",
+				 "repeatable": false
+				},
+				{
+				 "key": "cross-match-status",
+				 "name": "Field to populate for updating Cross Project Match status",
+				 "required": false,
+				 "type": "field-list",
+				 "repeatable": false
+				},
+				{
+				 "key": "cross-match-id",
+				 "name": "Field to populate for updating Cross Project Matched ID",
+				 "required": false,
+				 "type": "field-list",
+				 "repeatable": false
+				},
+				{
+				 "key": "cross-match-number",
+				 "name": "Field to populate for updating Cross Project Match - number of fields matched",
+				 "required": false,
+				 "type": "field-list",
+				 "repeatable": false
+				},
+				{
+				 "key": "cross-match-fields",
+				 "name": "Field to populate for updating Cross Project Match - fields matched",
+				 "required": false,
+				 "type": "field-list",
+				 "repeatable": false
+				},
+				{
+					"key": "project-fields",
+					"name": "Sync Field",
+					"required": false,
+					"type": "sub_settings",
+					"repeatable": true,
+					"sub_settings": [
+						{
+							"key": "data-destination-field",
+							"name": "Destination Field",
+							"required": false,
+							"type": "field-list",
+							"repeatable": false
+						},
+						{
+							"key": "data-source-field",
+							"name": "Source Field: This field is only needed if the Destination Field has a different variable name from the Source Field on the source project",
+							"required": false,
+							"type": "text",
+							"repeatable": false
+						}
+					]
+				},
+				{
+					"key": "new-records-addition",
+					"name": "Create new records in this project with missing Primary Match Field from Source project",
+					"type": "dropdown",
+					"choices": [
+						{
+							"value": "true",
+							"name": "true"
+						},
+						{
+							"value": "false",
+							"name": "false"
+						}
+					],
+					"repeatable": false
+				},
+				{
+					"key": "record-addition-flag",
+					"name": "Field to populate for flagging if the record is created by Cross Project Piping module",
+					"required": false,
+					"type": "field-list",
+					"repeatable": false
+				}
+			]
+		},
+		{
+			"key": "active-forms",
+			"name": "Active Form(s): Limit syncing to only these forms",
+			"required": false,
+			"type": "form-list",
+			"repeatable": true
+		},
+		{
+			"key": "sync-all-records-button",
+			"name": "Add a 'Sync All Records' button to this project's Record Status Dashboard",
+			"required": false,
+			"type": "checkbox",
+			"repeatable": false
+		},
+		{
+			"key": "verbose-sync-all-failure-logging",
+			"name": "Enable verbose logging for record sync failures when piping via 'Sync All' button",
+			"required": false,
+			"type": "checkbox",
+			"repeatable": false
+		},
+		{
+			"key": "sync-on-status",
+			"name": "Allow syncing on forms this status or less",
+			"type": "dropdown",
+			"choices": [
+				{
+					"value": 0,
+					"name": "Incomplete"
+				},
+				{
+					"value": 1,
+					"name": "Unverified"
+				},
+				{
+					"value": 2,
+					"name": "Complete"
+				}
+			],
+			"repeatable": false
+		}
+	]
+}

@@ -101,6 +101,21 @@ class SyncRecordsAcrossProjectsExternalModule extends AbstractExternalModule
 		return $subSettings;
 	}
 
+	function getFormStatusAllRecords($active_forms) {
+		if (empty($active_forms)) {
+			global $Proj;
+			$active_forms = array_keys($Proj->forms);
+		}
+
+		$fields = [];
+		foreach($active_forms as $form_name) {
+			$fields[] = $form_name . "_complete";
+		}
+		$data = \REDCap::getData('array', null, $fields);
+
+		return $data;
+	}
+
 
 	function validateSettings($settings){
 		error_reporting(E_ALL);
@@ -501,3 +516,4 @@ class SyncRecordsAcrossProjectsExternalModule extends AbstractExternalModule
 	}
 
 }
+

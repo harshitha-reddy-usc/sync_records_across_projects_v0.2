@@ -496,9 +496,6 @@ class SyncRecordsAcrossProjectsExternalModule extends AbstractExternalModule
 	 		$to_create = $src_project['cross_non_matched_ids'];
 			$records = [];
 			foreach ($to_create as $value) {
-				if(strpos($value, "IGNORE") !== false){
-					continue;
-				}
 				$rec = array(
 					$record_identifier => $counter,
 					$src_project['dest_match_field'] => $value,

@@ -1,8 +1,6 @@
 {
 	"name": "Sync Records Across Projects",
-
 	"namespace": "Vanderbilt\\SyncRecordsAcrossProjectsExternalModule",
-
 	"description": "Sync Records Across Projects pipes fields in one project into fields of another project if there is an EXACT MATCH on a third field in both projects. The module also provides details of matches in case of PARTIAL MATCH on secondary set of fields in both projects. Enable this module in the DESTINATION project and select appropriate fields in the configure panel.",
 	"authors": [
 		{
@@ -11,25 +9,14 @@
 			"institution": "USC - Keck School of Medicine"
 		}
 	],
-
 	"framework-version": 2,
-	 
 	"permissions": [
 		"redcap_every_page_before_render",
 		"select_data"
 	],
-
-	"links": {
-	},
-
-	"no-auth-pages": [
-
-	],
-
-	"system-settings": [
-		
-	],
-	
+	"links": {},
+	"no-auth-pages": [],
+	"system-settings": [],
 	"project-settings": [
 		{
 			"key": "admin-only-warning",
@@ -86,41 +73,41 @@
 							"repeatable": false
 						}
 					]
-				 },
-				 {
-				 "key": "number-secondary-matches",
-				 "name": "Number of matches for a successful secondary match",
-				 "required": false,
-				 "type": "text",
-				 "repeatable": false
 				},
 				{
-				 "key": "cross-match-status",
-				 "name": "Field to populate for updating Cross Project Match status",
-				 "required": false,
-				 "type": "field-list",
-				 "repeatable": false
+					"key": "number-secondary-matches",
+					"name": "Number of matches for a successful secondary match",
+					"required": false,
+					"type": "text",
+					"repeatable": false
 				},
 				{
-				 "key": "cross-match-id",
-				 "name": "Field to populate for updating Cross Project Matched ID",
-				 "required": false,
-				 "type": "field-list",
-				 "repeatable": false
+					"key": "cross-match-status",
+					"name": "Field to populate for updating Cross Project Match status",
+					"required": false,
+					"type": "field-list",
+					"repeatable": false
 				},
 				{
-				 "key": "cross-match-number",
-				 "name": "Field to populate for updating Cross Project Match - number of fields matched",
-				 "required": false,
-				 "type": "field-list",
-				 "repeatable": false
+					"key": "cross-match-id",
+					"name": "Field to populate for updating Cross Project Matched ID",
+					"required": false,
+					"type": "field-list",
+					"repeatable": false
 				},
 				{
-				 "key": "cross-match-fields",
-				 "name": "Field to populate for updating Cross Project Match - fields matched",
-				 "required": false,
-				 "type": "field-list",
-				 "repeatable": false
+					"key": "cross-match-number",
+					"name": "Field to populate for updating Cross Project Match - number of fields matched",
+					"required": false,
+					"type": "field-list",
+					"repeatable": false
+				},
+				{
+					"key": "cross-match-fields",
+					"name": "Field to populate for updating Cross Project Match - fields matched",
+					"required": false,
+					"type": "field-list",
+					"repeatable": false
 				},
 				{
 					"key": "project-fields",
@@ -144,29 +131,6 @@
 							"repeatable": false
 						}
 					]
-				},
-				{
-					"key": "new-records-addition",
-					"name": "Create new records in this project with missing Primary Match Field from Source project",
-					"type": "dropdown",
-					"choices": [
-						{
-							"value": "true",
-							"name": "true"
-						},
-						{
-							"value": "false",
-							"name": "false"
-						}
-					],
-					"repeatable": false
-				},
-				{
-					"key": "record-addition-flag",
-					"name": "Field to populate for flagging if the record is created by Cross Project Piping module",
-					"required": false,
-					"type": "field-list",
-					"repeatable": false
 				}
 			]
 		},

@@ -163,8 +163,6 @@ class SyncRecordsAcrossProjectsExternalModule extends AbstractExternalModule
 		$cross_match_id = $this->getProjectSetting('cross-match-id');
 		$cross_match_number = $this->getProjectSetting('cross-match-number');
 		$cross_match_fields = $this->getProjectSetting('cross-match-fields');
-		$new_records_additions = $this->getProjectSetting('new-records-addition');
-		$record_addition_flag = $this->getProjectSetting('record-addition-flag');
 		
 		// fill $projects['source'] array with source project info arrays
 		foreach ($project_ids as $project_index => $pid) {
@@ -181,10 +179,9 @@ class SyncRecordsAcrossProjectsExternalModule extends AbstractExternalModule
 				'cross_match_id' => $cross_match_id[$project_index],
 				'cross_match_number' => $cross_match_number[$project_index],
 				'cross_match_fields' => $cross_match_fields[$project_index],
-				'new_records_additions' => $new_records_additions[$project_index],
-				'record_addition_flag' => $record_addition_flag[$project_index],
 				'dest_forms_by_field_name' => []
 			];
+
 			
 			// where source data/match fields are empty, use destination match/data field names
 			if (empty($source_project['source_match_field'])) {
@@ -274,9 +271,7 @@ class SyncRecordsAcrossProjectsExternalModule extends AbstractExternalModule
 			$match_field_names[] = $project['dest_match_field'];
 		}
 
-		$record_identifier_field= \REDCap::getRecordIdField();
-		$this->projects['destination']['record_identifier_field'] = $record_identifier_field;
-		$match_field_names = array_merge([$record_identifier_field], $match_field_names, $project['dest_match_field_secondary']);
+		$match_field_names = array_merge($match_field_names, $project['dest_match_field_secondary']);
 		
 		$params = [
 			'project_id' => $this->projects['destination']['project_id'],
@@ -297,15 +292,6 @@ class SyncRecordsAcrossProjectsExternalModule extends AbstractExternalModule
 		}
 		
 		$this->projects['destination']['records_match_fields'] = $data;
-
-		if (!empty($data)) {
-			// Get the last record identifier number
-			$last_record = end($data);
-			$last_record_identifier_number = $last_record[$record_identifier_field];
-			$this->projects['destination']['next_record_identifier_number'] = intval($last_record_identifier_number) + 1;
-		} else {
-			$this->projects['destination']['next_record_identifier_number'] = 1;
-		}
 	}
 
 	
@@ -331,28 +317,6 @@ class SyncRecordsAcrossProjectsExternalModule extends AbstractExternalModule
 			];
 			$this->projects['source'][$project_index]['source_data'] = \REDCap::getData($params);
 
-			#store all the ids as non matched ids
-			$cross_non_matched_ids = [];
-			foreach ($this->projects['source'][$project_index]['source_data'] as $src_rid => $src_rec) {
-				foreach ($src_rec as $eid => $field_data) {
-					if(!empty($field_data[$match_field])) {
-						array_push($cross_non_matched_ids, $field_data[$match_field]);
-					}
-				}
-			}
-
-			//get all destination primary field values
-			$all_dest_match_fields = [];
-			$dest_match_field = $project['dest_match_field'];
-			foreach($this->projects['destination']['records_match_fields'] as $dest_record) {
-			    $dest_match_field_value = $dest_record[$dest_match_field];
-				if (!empty($dest_match_field_value)) {
-					array_push($all_dest_match_fields, $dest_match_field_value);
-				}
-			}
-
-			$src_cross_non_matched_ids = array_diff($cross_non_matched_ids, $all_dest_match_fields);
-			$this->projects['source'][$project_index]['cross_non_matched_ids'] = $src_cross_non_matched_ids;
 		}
 	}
 
@@ -415,18 +379,18 @@ class SyncRecordsAcrossProjectsExternalModule extends AbstractExternalModule
 						$match_count = count($matched_keys);
 
 						if ($match_count >= intval($src_project['number_secondary_matches'])) {
-							$match_status = 'partial';
-							array_push($matched_ids, $field_data[$src_match_field]);
-							array_push($matched_fields_number, $match_count);
-							array_push($matched_fields_names, implode(",", $matched_keys));
-							if (($key = array_search($field_data[$src_match_field], $src_project['cross_non_matched_ids'])) !== false) {
-								unset($this->projects['source'][$p_index]['cross_non_matched_ids'][$key]);
-							}
+							$data_to_save[$dst_rid][$dst_event_id][$src_project['cross_match_status']] = 'partial';
+							$data_to_save[$dst_rid][$dst_event_id][$src_project['cross_match_id']] .= "$field_data[$src_match_field] \n";
+							$data_to_save[$dst_rid][$dst_event_id][$src_project['cross_match_number']] .= "$match_count \n";
+							$data_to_save[$dst_rid][$dst_event_id][$src_project['cross_match_fields']] .=  implode(",", $matched_keys) . "\n";
 						}
-						continue;
 					}
 					else {
-						$match_status = 'exact';
+						$data_to_save[$dst_rid][$dst_event_id][$src_project['cross_match_status']] = 'exact';
+						unset($data_to_save[$dst_rid][$dst_event_id][$src_project['cross_match_id']]);
+						unset($data_to_save[$dst_rid][$dst_event_id][$src_project['cross_match_number']]);
+						unset($data_to_save[$dst_rid][$dst_event_id][$src_project['cross_match_fields']]);
+
 						foreach ($field_data as $field_name => $field_value) {
 							// skip this field if it's the match field and match field isn't in the set of fields to be synced
 							if ($field_name == $src_match_field && !$source_match_field_is_in_sync_fields) {
@@ -456,61 +420,15 @@ class SyncRecordsAcrossProjectsExternalModule extends AbstractExternalModule
 								$data_to_save[$dst_rid][$dst_event_id][$dst_name] = $field_value;
 							}
 						}
-						if (($key = array_search($field_data[$src_match_field], $src_project['cross_non_matched_ids'])) !== false) {
-							unset($this->projects['source'][$p_index]['cross_non_matched_ids'][$key]);
-						}
-						break;
+						return \REDCap::saveData('array', $data_to_save);
 					}
 				}
 			}
 		}
-
-		//Populate match related fields
-		if (!empty($src_project['cross_match_status'])) {
-			$data_to_save[$dst_rid][$dst_event_id][$src_project['cross_match_status']] = $match_status;
-		}
-		if (!empty($src_project['cross_match_id'])) {
-			$data_to_save[$dst_rid][$dst_event_id][$src_project['cross_match_id']] = ($match_status === 'partial') ? implode(" | ", $matched_ids) : ' ';
-		}
-		if (!empty($src_project['cross_match_number'])) {
-			$data_to_save[$dst_rid][$dst_event_id][$src_project['cross_match_number']] = ($match_status === 'partial') ? implode(" | ", $matched_fields_number) : ' ';
-		}
-		if (!empty($src_project['cross_match_fields'])) {
-			$data_to_save[$dst_rid][$dst_event_id][$src_project['cross_match_fields']] = ($match_status === 'partial') ? implode(" | ", $matched_fields_names) : ' ';
-		}
-
-		
 		if (!empty($data_to_save[$dst_rid])) {
-			$result = \REDCap::saveData('array', $data_to_save);
-			return $result;
+			return \REDCap::saveData('array', $data_to_save);
 		}
-	}
 
-	function createNewDestinationRecords() {
-		$record_identifier = $this->projects['destination']['record_identifier_field'];
-		$counter = $this->projects['destination']['next_record_identifier_number'];
-		foreach ($this->projects['source'] as $p_index => $src_project) {
-			if ($src_project['new_records_additions'] !== "true" || empty($src_project['record_addition_flag'])) {
-				continue;
-			}
-	 		$to_create = $src_project['cross_non_matched_ids'];
-			$records = [];
-			foreach ($to_create as $value) {
-				$rec = array(
-					$record_identifier => $counter,
-					$src_project['dest_match_field'] => $value,
-					$src_project['record_addition_flag'] => "true"
-				);
-				$counter = $counter + 1;
-				array_push($records, $rec);
-			}
-			$result = \REDCap::saveData('json', json_encode($records));
-
-			if (!empty($result['errors'])) {
-				error_log("Sync Records Across Projects: Error Creating New Records:<br />\n". var_export($result['errors'], true));
-			}
-		}
 	}
 
 }
-

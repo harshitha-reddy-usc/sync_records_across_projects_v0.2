@@ -13,7 +13,7 @@ external module tab on the project.
 2. In the Destination project, click on External Modules on the left-hand navigation bar. Then click on the
 Configure button.
 **3. Source Project:**
-This field is a drop down list of all the projects the configuring user has access to.
+This field is the project the configuring user has access to.
 
 ![This picture shows project settings and values columns in the module's configuration view](/docs/readme_img_2.png)
 
@@ -58,16 +58,6 @@ This is for specifying the field name that is added in the instrument, that stor
 
 ![This picture shows the fields necessary to populate Cross Project Match Status, Cross Project Matched IDs, Number of Fields Matched, Fields Matched ](/docs/readme_img_12.png)
 
-**13. Create new records in this project with missing Primary Match Field from Source project:**
-Set this field to true in order to create new records that is missing in the current project, but present in the source project. This will create a new record with Unique Source Field filled which can be used for further piping.
-
-**14. Field to populate for flagging if the record is created by Sync Records Across Projects module:**
-This is for specifying the field name that is added in the instrument, that contains value 'true' if the record the record was created by Sync Records Across Projects module.
-
-![This picture shows the fields for setting creation of new records and field for marking the creation ](/docs/readme_img_13.png)
-
-<span style='color: #ff0000;'>Note all configurations can repeat, in the instance you need to pipe values from multiple projects into one. Simply select the + icon in the gray space at the top.</span>
-
 <span style='font-weight: 600; text-decoration: underline;'>Setting up your piped field.<span>
 1. Select the destination field from the drop down list.
 
@@ -103,12 +93,6 @@ The status can always be reverted to incomplete to utilize this function.</span>
 
 <span style='color: #ff0000; font-size: 1.25rem;'>Please note that if Sync Records Across Projects is used there is a risk of overwriting data
 in an instrument. Any record saved with data on it weather piped or not will save on that record.</span>
-
-<h3 style='color: #33B9FF;'>Support for Repeating Instances</h3>
-This module supports repeating instances in the following way:
-'Unique Match Field' and 'Destination Field' settings may both (or either) be set to fields that exist in repeating instruments of the destination project.
-
-The module cannot, however, support configurations that require the 'Alternate Source Match Field' or 'Source Field' settings to point to fields that exist in repeating instruments.
 
 ### Note: Field Embedding
 The Sync Records Across Projects module may not work correctly when interacting with embedded fields.
